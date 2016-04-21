@@ -38,11 +38,15 @@ GC_FREE_SPACE_DIVISOR=<value> - change the default trade-off between garbage col
 Note: the values assigned to the specified environment variables override the similar default (or the preset at the compilation time) values.
 
 
-What can I do to maximize allocation performance?
-
-Here are some hints:
-
+Q:What can I do to maximize allocation performance?
+A:Here are some hints:
 Use GC_MALLOC_ATOMIC where possible.
 For a multithreaded application, take advantage of gc_local_alloc.h to avoid locking on each allocation.
 For a single-threaded application, use a GC library without thread support. If this is inconvenient, use gc_local_alloc.h.
 If you use large statically allocated arrays or mapped files, consider GC_exclude_static_roots.
+
+Q:If my heap uses 2 GB on a 32-bit machine, won't every other integer or other random data be misinterpreted as a pointer by the collector? Thus won't way too much memory be retained?
+
+A:Maybe. Probably, if the collector is used purely conservatively, with no pointer layout information (such as use of GC_MALLOC_ATOMIC).
+With a gigabyte heap, you are clearly much better off on a 64-bit machine. Empirical evidence seems to suggest that some such applications work on a 32-bit machine, and others don't perform acceptably.
+Simple probability calculations for pointer misidentifications are generally incorrect. The probability of misinterpreting an integer is typically reduced significantly by a number of collector features and fortunate accidents. Most integers are small, and small integers can generally not be heap addresses. The collector black-listing mechanism avoids allocating areas that are prone to be targets of misinterpreted references. The collector can be told to ignore some or all pointers to object interiors.
