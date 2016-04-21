@@ -1,0 +1,48 @@
+http://tinygc.sourceforge.net/
+Tuning macros
+Useful macros for tuning (same as in BoehmGC):
+GC_DLL - compile to produce a DLL (gc.dll);
+ALL_INTERIOR_POINTERS - turn on "all-interior-pointers" mode by default;
+GC_GCJ_SUPPORT - compile with GCJ-style allocation support;
+GC_THREADS - compile with thread support (pthread-based by default);
+GC_WIN32_THREADS - compile with Win32-based thread support;
+JAVA_FINALIZATION_NOT_NEEDED - exclude GC_finalize_all() from the API;
+DONT_ADD_BYTE_AT_END - do not pad objects even if "all-interior-pointers" mode is on;
+FINALIZE_ON_DEMAND - causes finalizers to be run only in response to explicit GC_invoke_finalizers() calls by default (unless overridden at run-time);
+GC_IGNORE_GCJ_INFO - disable GCJ-style type information (useful for debugging);
+GC_DONT_EXPAND - do not implicitly expand the heap by default (unless overridden at run-time);
+GC_INITIAL_HEAP_SIZE=<value> - set the desired default initial heap size (in bytes);
+GC_FREE_SPACE_DIVISOR=<value> - the default trade-off between garbage collection and heap growth;
+GC_MAX_RETRIES=<value> - the default maximum number of garbage collections attempted before reporting out of memory after a heap expansion failure.
+
+Useful macros for client application tuning (same as in BoehmGC):
+GC_DONT_EXPAND - do not implicitly expand the heap (unless overridden at run-time);
+GC_DLL - use TinyGC residing in a DLL;
+GC_THREADS - declare the prototypes for the collector multi-threading support;
+GC_CALL=<calling_conv> - explicitly specify calling convention for the GC API functions;
+GC_CALLBACK=<calling_conv> - explicitly specify an alternate calling convention for the GC API user callbacks;
+GC_INITIAL_HEAP_SIZE=<value> - set the desired initial heap size (in bytes);
+GC_MAXIMUM_HEAP_SIZE=<value> - set the desired maximum heap size (in bytes);
+GC_FREE_SPACE_DIVISOR=<value> - set the desired trade-off between garbage collection and heap growth;
+GC_MAX_RETRIES=<value> - set the desired maximum number of garbage collections attempted before reporting out of memory after a heap expansion failure.
+
+Environment variables
+Environment variables recognized (if supported, same as in BoehmGC):
+GC_DONT_GC - turn off garbage collection;
+GC_PRINT_STATS - turn on statistic printing on every garbage collection (if supported);
+GC_ALL_INTERIOR_POINTERS - turn on "all-interior-pointers" collector mode;
+GC_IGNORE_GCJ_INFO - ignore the GCJ-style type descriptors (if supported);
+GC_INITIAL_HEAP_SIZE=<value> - set the initial heap size (in bytes);
+GC_MAXIMUM_HEAP_SIZE=<value> - set the maximum heap size (in bytes);
+GC_FREE_SPACE_DIVISOR=<value> - change the default trade-off between garbage collection and heap growth.
+Note: the values assigned to the specified environment variables override the similar default (or the preset at the compilation time) values.
+
+
+What can I do to maximize allocation performance?
+
+Here are some hints:
+
+Use GC_MALLOC_ATOMIC where possible.
+For a multithreaded application, take advantage of gc_local_alloc.h to avoid locking on each allocation.
+For a single-threaded application, use a GC library without thread support. If this is inconvenient, use gc_local_alloc.h.
+If you use large statically allocated arrays or mapped files, consider GC_exclude_static_roots.
